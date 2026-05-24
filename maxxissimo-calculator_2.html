@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Calculator — Maxxissimo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #F5C518;
+    --gold-light: #FFE066;
+    --gold-dark: #C49A00;
+    --dark: #080C14;
+    --dark-2: #0D1320;
+    --dark-3: #111827;
+    --dark-4: #1a2235;
+    --white: #FFFFFF;
+    --gray: #8A95A8;
+    --gray-light: #B0BAC9;
+    --green: #22C55E;
+    --green-dark: #166534;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG EFFECTS */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(245,197,24,0.025) 0px, rgba(245,197,24,0.025) 1px, transparent 1px, transparent 80px),
+      repeating-linear-gradient(0deg, rgba(245,197,24,0.025) 0px, rgba(245,197,24,0.025) 1px, transparent 1px, transparent 80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse, rgba(245,197,24,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeDown 0.6s ease forwards;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(38px, 7vw, 64px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+  }
+
+  .header h1 .white { color: var(--white); display: block; }
+  .header h1 .gold {
+    color: var(--gold);
+    display: block;
+    text-shadow: 0 0 40px rgba(245,197,24,0.3);
+  }
+
+  .header p {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(17px, 2.8vw, 24px);
+    color: var(--gray);
+    letter-spacing: 2px;
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+
+  .gold-line {
+    width: 60px; height: 2px;
+    background: var(--gold);
+    margin: 16px auto 0;
+    box-shadow: 0 0 16px rgba(245,197,24,0.4);
+  }
+
+  /* CARD */
+  .card {
+    background: var(--dark-2);
+    border: 1px solid rgba(245,197,24,0.12);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FORM */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 540px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .card { padding: 24px 20px; }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .field-wrap {
+    position: relative;
+  }
+
+  .field-wrap .unit {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    color: var(--gray);
+    pointer-events: none;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    background: var(--dark-3);
+    border: 1px solid rgba(245,197,24,0.15);
+    border-radius: 8px;
+    padding: 14px 40px 14px 16px;
+    color: var(--white);
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  input[type="number"]:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(245,197,24,0.1);
+  }
+
+  /* SLIDER */
+  .slider-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .slider-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .slider-top label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .slider-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--dark-4);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 10px rgba(245,197,24,0.5);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  /* CALC BUTTON */
+  .btn-calc {
+    width: 100%;
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    border-radius: 8px;
+    padding: 18px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-calc::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+  }
+
+  .btn-calc:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(245,197,24,0.35);
+  }
+
+  .btn-calc:active { transform: translateY(0); }
+
+  /* RESULTS */
+  .results {
+    display: none;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .results.visible { display: block; }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 540px) {
+    .results-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .stat-box {
+    background: var(--dark-3);
+    border: 1px solid rgba(245,197,24,0.1);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-box .stat-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gray);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .stat-box .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(22px, 4vw, 32px);
+    color: var(--gold);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .stat-box.hero {
+    background: linear-gradient(135deg, rgba(245,197,24,0.12), rgba(245,197,24,0.04));
+    border-color: rgba(245,197,24,0.3);
+    grid-column: 1 / -1;
+    padding: 24px;
+  }
+
+  .stat-box.hero .stat-label { font-size: 12px; }
+  .stat-box.hero .stat-value {
+    font-size: clamp(40px, 8vw, 64px);
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(245,197,24,0.4);
+  }
+
+  /* CHART */
+  .chart-wrap {
+    background: var(--dark-3);
+    border: 1px solid rgba(245,197,24,0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .chart-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gray);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    background: rgba(245,197,24,0.04);
+    border: 1px solid rgba(245,197,24,0.1);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .disclaimer strong { color: var(--gold); }
+
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8,12,20,0.92);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    backdrop-filter: blur(6px);
+  }
+
+  .modal-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--dark-2);
+    border: 1px solid rgba(245,197,24,0.4);
+    border-radius: 16px;
+    padding: 40px 32px;
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 85vh;
+    transform: scale(0.9);
+    transition: transform 0.4s ease;
+    box-shadow: 0 0 80px rgba(245,197,24,0.15);
+  }
+
+  .modal-overlay.visible .modal {
+    transform: scale(1);
+  }
+
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+    box-shadow: 0 0 20px rgba(245,197,24,0.8);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 18px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gray);
+    cursor: pointer;
+    text-transform: uppercase;
+    opacity: 0.5;
+    border: none;
+    background: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-close:hover { opacity: 1; }
+
+  .modal-eyebrow {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    opacity: 0.9;
+  }
+
+  .modal-result-recap {
+    background: rgba(245,197,24,0.08);
+    border: 1px solid rgba(245,197,24,0.2);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+  }
+
+  .modal-result-recap .recap-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gray);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .modal-result-recap .recap-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 7vw, 54px);
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-shadow: 0 0 30px rgba(245,197,24,0.4);
+    line-height: 1;
+  }
+
+  .modal h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 5vw, 42px);
+    color: var(--white);
+    letter-spacing: 2px;
+    line-height: 1.05;
+    margin-bottom: 12px;
+  }
+
+  .modal h2 span { color: var(--gold); }
+
+  .modal p {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(14px, 2vw, 17px);
+    color: var(--gray-light);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .modal-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-btn-no, .modal-btn-yes {
+    background: transparent;
+    color: var(--white);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(16px, 2.5vw, 20px);
+    letter-spacing: 2px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(245,197,24,0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  .modal-btn-no:hover, .modal-btn-yes:hover {
+    background: rgba(245,197,24,0.1);
+    border-color: var(--gold);
+    transform: translateY(-1px);
+  }
+
+  /* TUTOR LIST inside modal */
+  .modal-tutor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 400px) {
+    .modal-tutor-grid { grid-template-columns: 1fr; }
+    .modal { padding: 32px 20px; }
+  }
+  .tutor-box {
+    background: linear-gradient(135deg, #0D1A10, #0D1320);
+    border: 1px solid rgba(245,197,24,0.35);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .tutor-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+    box-shadow: 0 0 20px rgba(245,197,24,0.6);
+  }
+
+  .tutor-box::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; right: -100px;
+    width: 300px; height: 300px;
+    background: radial-gradient(ellipse, rgba(245,197,24,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .tutor-eyebrow {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+
+  .tutor-box h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 6vw, 52px);
+    color: var(--white);
+    letter-spacing: 2px;
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+
+  .tutor-box h3 span { color: var(--gold); text-shadow: 0 0 30px rgba(245,197,24,0.4); }
+
+  .tutor-box p {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(15px, 2.2vw, 19px);
+    color: var(--gray-light);
+    margin-bottom: 28px;
+    line-height: 1.6;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .tutor-btns {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-yes, .btn-no {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(16px, 2.5vw, 20px);
+    letter-spacing: 2px;
+    border-radius: 8px;
+    padding: 16px 36px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-yes {
+    background: var(--gold);
+    color: var(--dark);
+    box-shadow: 0 4px 20px rgba(245,197,24,0.25);
+  }
+
+  .btn-yes:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(245,197,24,0.45);
+  }
+
+  .btn-no {
+    background: var(--gold);
+    color: var(--dark);
+    box-shadow: 0 4px 20px rgba(245,197,24,0.25);
+  }
+
+  .btn-no:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(245,197,24,0.45);
+  }
+
+  /* RESPONSES */
+  .response-yes, .response-no {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(15px, 2vw, 18px);
+    line-height: 1.6;
+    animation: fadeUp 0.3s ease forwards;
+  }
+
+  .response-yes {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--gray);
+  }
+
+  .response-no {
+    background: rgba(245,197,24,0.08);
+    border: 1px solid rgba(245,197,24,0.25);
+    color: var(--white);
+  }
+
+  .response-yes.visible, .response-no.visible { display: block; }
+
+  .btn-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366;
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-top: 16px;
+    transition: all 0.2s;
+  }
+
+  .btn-wa:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37,211,102,0.3);
+  }
+
+  .wa-icon {
+    width: 22px; height: 22px;
+    fill: #000;
+  }
+
+  /* TUTOR GRID */
+  .tutor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  @media (max-width: 480px) {
+    .tutor-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .btn-tutor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #25D366;
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(14px, 2vw, 17px);
+    letter-spacing: 1px;
+    padding: 12px 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-tutor:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37,211,102,0.3);
+  }
+
+  .btn-tutor-disabled {
+    background: var(--dark-4);
+    color: var(--gray);
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .btn-tutor-disabled:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .wa-icon-sm {
+    width: 16px; height: 16px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(138,149,168,0.4);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">Maxxissimo · Trading da Zero</div>
+    <h1>
+      <span class="white">SIMULA IL TUO FUTURO</span>
+      <span class="gold">IN 60 SECONDI</span>
+    </h1>
+    <p>Da quanto hai, a quanto puoi arrivare</p>
+    <div class="gold-line"></div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="card">
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Capitale iniziale</label>
+        <div class="field-wrap">
+          <input type="number" id="capitale" value="5000" min="0" step="100">
+          <span class="unit">€</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Versamento mensile</label>
+        <div class="field-wrap">
+          <input type="number" id="mensile" value="200" min="0" step="50">
+          <span class="unit">€</span>
+        </div>
+      </div>
+
+      <div class="slider-wrap">
+        <div class="slider-top">
+          <label>Rendimento mensile</label>
+          <span class="slider-val" id="rendLabel">3%</span>
+        </div>
+        <input type="range" id="rendimento" min="0.5" max="10" step="0.5" value="3">
+      </div>
+
+      <div class="slider-wrap">
+        <div class="slider-top">
+          <label>Periodo</label>
+          <span class="slider-val" id="anniLabel">5 anni</span>
+        </div>
+        <input type="range" id="anni" min="1" max="20" step="1" value="5">
+      </div>
+
+    </div>
+
+    <button class="btn-calc" onclick="calcola()">CALCOLA IL MIO OBIETTIVO</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+
+    <div class="card">
+      <div class="results-grid" id="statsGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="chart-wrap">
+        <div class="chart-label">Crescita del capitale nel tempo</div>
+        <canvas id="chart" height="200"></canvas>
+      </div>
+
+      <div class="disclaimer">
+        <strong>Nota:</strong> Questo strumento ha scopo puramente educativo e illustrativo. I rendimenti mostrati sono ipotetici e non garantiti. Il trading comporta rischi — i risultati passati non sono indicativi di quelli futuri. Non costituisce consulenza finanziaria.
+      </div>
+    </div>
+
+    <!-- TUTOR BOX -->
+    <div class="tutor-box" id="tutorBox">
+      <div class="tutor-eyebrow">IL PROSSIMO PASSO</div>
+      <h3>Hai calcolato il tuo obiettivo.<br><span>Ora serve un piano vero.</span></h3>
+      <p>Un numero sul grafico non basta. Serve qualcuno che ti aiuti a costruire la strategia, gestire il rischio e non mollare quando il mercato va contro.</p>
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:clamp(18px,3vw,26px); color:var(--white); letter-spacing:3px; margin:20px 0 12px;">SEI GIÀ CON NOI?</div>
+      <div class="tutor-btns">
+        <button class="btn-yes" onclick="showResponse('yes')">SÌ, SONO CON VOI</button>
+        <button class="btn-no" onclick="showResponse('no')">NO, VOGLIO ESSERE SEGUITO</button>
+      </div>
+
+      <div class="response-yes" id="resp-yes">
+        <p style="font-family:'Oswald',sans-serif; font-size:clamp(13px,1.8vw,16px); color:var(--gray); margin-bottom:16px; letter-spacing:1px;">
+          Scrivi direttamente al tuo tutor di riferimento:
+        </p>
+        <div class="tutor-grid">
+          <a class="btn-tutor" href="https://wa.me/393934022837?text=Ciao%20Gaetano%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20parlare%20del%20mio%20piano." target="_blank">
+            <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Gaetano
+          </a>
+          <a class="btn-tutor" href="https://wa.me/393514166200?text=Ciao%20Roman%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20parlare%20del%20mio%20piano." target="_blank">
+            <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Roman
+          </a>
+          <a class="btn-tutor btn-tutor-disabled" href="#" onclick="return false;">
+            <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Christopher
+          </a>
+          <a class="btn-tutor btn-tutor-disabled" href="#" onclick="return false;">
+            <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Luigi
+          </a>
+          <a class="btn-tutor" href="https://wa.me/393518574762?text=Ciao%20Mattia%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20parlare%20del%20mio%20piano." target="_blank">
+            <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Mattia
+          </a>
+          <a class="btn-tutor" href="https://wa.me/41415881194?text=Ciao%20Andrea%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20parlare%20del%20mio%20piano." target="_blank">
+            <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Andrea Campagna
+          </a>
+        </div>
+        <p style="font-family:'Oswald',sans-serif; font-size:12px; color:var(--gray); margin-top:12px; letter-spacing:1px; opacity:0.7;">⚡ Risponde entro pochi minuti</p>
+      </div>
+
+      <div class="response-no" id="resp-no">
+        Puoi farcela — ma ci vuole un metodo. Scrivimi direttamente, valutiamo insieme se e come il tuo obiettivo è raggiungibile.
+        <br>
+        <a class="btn-wa" href="https://wa.me/393478982799?text=Ciao%20Andrea%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20capire%20se%20il%20mio%20obiettivo%20%C3%A8%20realistico%20per%20me." target="_blank">
+          <svg class="wa-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          SCRIVIMI SU WHATSAPP
+        </a>
+        <p style="font-family:'Oswald',sans-serif; font-size:12px; color:var(--gray); margin-top:10px; letter-spacing:1px; opacity:0.7;">⚡ Risponde entro pochi minuti</p>
+      </div>
+    </div>
+
+  </div><!-- end results -->
+
+  <div class="footer">Maxxissimo · Contenuto educativo · Non costituisce consulenza finanziaria</div>
+
+</div>
+
+<script>
+  // Sliders
+  const rendInput = document.getElementById('rendimento');
+  const anniInput = document.getElementById('anni');
+  const rendLabel = document.getElementById('rendLabel');
+  const anniLabel = document.getElementById('anniLabel');
+
+  rendInput.addEventListener('input', () => { rendLabel.textContent = rendInput.value + '%'; });
+  anniInput.addEventListener('input', () => { anniLabel.textContent = anniInput.value + ' ann' + (anniInput.value == 1 ? 'o' : 'i'); });
+
+  // Format
+  function fmt(n) {
+    if (n >= 1000000) return '€' + (n/1000000).toFixed(2) + 'M';
+    if (n >= 1000) return '€' + Math.round(n).toLocaleString('it-IT');
+    return '€' + Math.round(n);
+  }
+
+  let chartInstance = null;
+
+  function calcola() {
+    const C0 = parseFloat(document.getElementById('capitale').value) || 0;
+    const M  = parseFloat(document.getElementById('mensile').value) || 0;
+    const r  = parseFloat(rendInput.value) / 100;
+    const Y  = parseInt(anniInput.value);
+    const mesi = Y * 12;
+
+    // Compound monthly
+    const dataPoints = [];
+    const labels = [];
+    let val = C0;
+    for (let m = 0; m <= mesi; m++) {
+      if (m > 0) val = val * (1 + r) + M;
+      if (m % 12 === 0) {
+        dataPoints.push(Math.round(val));
+        labels.push('Anno ' + (m/12));
+      }
+    }
+
+    const finale = dataPoints[dataPoints.length - 1];
+    const versato = C0 + M * mesi;
+    const guadagno = finale - versato;
+    const moltiplicatore = (finale / (C0 || 1)).toFixed(1);
+
+    // Stats
+    const grid = document.getElementById('statsGrid');
+    grid.innerHTML = `
+      <div class="stat-box hero">
+        <div class="stat-label">Capitale finale stimato</div>
+        <div class="stat-value">${fmt(finale)}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Totale versato</div>
+        <div class="stat-value">${fmt(versato)}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Guadagno generato</div>
+        <div class="stat-value" style="color:var(--green)">${fmt(guadagno)}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Moltiplicatore</div>
+        <div class="stat-value">×${moltiplicatore}</div>
+      </div>
+    `;
+
+    // Chart
+    if (chartInstance) chartInstance = null;
+    const canvas = document.getElementById('chart');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const W = canvas.offsetWidth || 600;
+    const H = 200;
+    canvas.width = W;
+    canvas.height = H;
+
+    const max = Math.max(...dataPoints);
+    const pad = { top: 20, bottom: 30, left: 50, right: 20 };
+    const chartW = W - pad.left - pad.right;
+    const chartH = H - pad.top - pad.bottom;
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(245,197,24,0.06)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.top + (chartH / 4) * i;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + chartW, y);
+      ctx.stroke();
+      // Y labels
+      const val = max - (max / 4) * i;
+      ctx.fillStyle = 'rgba(138,149,168,0.6)';
+      ctx.font = '10px Inter';
+      ctx.textAlign = 'right';
+      ctx.fillText(fmt(val), pad.left - 6, y + 4);
+    }
+
+    // Area fill
+    const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+    grad.addColorStop(0, 'rgba(245,197,24,0.2)');
+    grad.addColorStop(1, 'rgba(245,197,24,0)');
+
+    ctx.beginPath();
+    dataPoints.forEach((v, i) => {
+      const x = pad.left + (i / (dataPoints.length - 1)) * chartW;
+      const y = pad.top + chartH - (v / max) * chartH;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.lineTo(pad.left + chartW, pad.top + chartH);
+    ctx.lineTo(pad.left, pad.top + chartH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    ctx.strokeStyle = '#F5C518';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    dataPoints.forEach((v, i) => {
+      const x = pad.left + (i / (dataPoints.length - 1)) * chartW;
+      const y = pad.top + chartH - (v / max) * chartH;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // X labels
+    ctx.fillStyle = 'rgba(138,149,168,0.6)';
+    ctx.font = '10px Inter';
+    ctx.textAlign = 'center';
+    labels.forEach((l, i) => {
+      if (i % Math.ceil(labels.length / 6) === 0 || i === labels.length - 1) {
+        const x = pad.left + (i / (labels.length - 1)) * chartW;
+        ctx.fillText(l, x, H - 8);
+      }
+    });
+
+    // Dots on line
+    ctx.fillStyle = '#F5C518';
+    dataPoints.forEach((v, i) => {
+      const x = pad.left + (i / (dataPoints.length - 1)) * chartW;
+      const y = pad.top + chartH - (v / max) * chartH;
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Show results
+    document.getElementById('results').classList.add('visible');
+
+    // Update modal recap value
+    document.getElementById('modal-finale').textContent = fmt(finale);
+
+    // Reset modal to step 1
+    document.getElementById('modal-step1').style.display = 'block';
+    document.getElementById('modal-step-no').style.display = 'none';
+    document.getElementById('modal-step-yes').style.display = 'none';
+
+    // Scroll to results, then show modal after 2.5s
+    setTimeout(() => {
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+
+    setTimeout(() => {
+      document.getElementById('modalOverlay').classList.add('visible');
+    }, 2500);
+  }
+
+  function showResponse(type) {
+    document.getElementById('resp-yes').classList.remove('visible');
+    document.getElementById('resp-no').classList.remove('visible');
+    if (type === 'yes') {
+      document.getElementById('resp-yes').classList.add('visible');
+    } else {
+      document.getElementById('resp-no').classList.add('visible');
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('visible');
+  }
+
+  function modalShowNo() {
+    document.getElementById('modal-step1').style.display = 'none';
+    document.getElementById('modal-step-no').style.display = 'block';
+  }
+
+  function modalShowYes() {
+    document.getElementById('modal-step1').style.display = 'none';
+    document.getElementById('modal-step-yes').style.display = 'block';
+  }
+
+  function modalBack() {
+    document.getElementById('modal-step-no').style.display = 'none';
+    document.getElementById('modal-step-yes').style.display = 'none';
+    document.getElementById('modal-step1').style.display = 'block';
+  }
+
+  // Close on overlay click
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕ chiudi</button>
+
+    <!-- Step 1: domanda -->
+    <div id="modal-step1">
+      <div class="modal-eyebrow">Il tuo obiettivo</div>
+      <div class="modal-result-recap">
+        <div class="recap-label">Capitale finale stimato</div>
+        <div class="recap-value" id="modal-finale">—</div>
+      </div>
+      <h2>Ora serve<br><span>un piano vero.</span></h2>
+      <p>Un numero non basta. Serve qualcuno che ti aiuti a costruirlo, gestire il rischio e non mollare quando il mercato va contro.</p>
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:clamp(18px,3vw,24px); color:var(--white); letter-spacing:3px; margin:16px 0 10px;">SEI GIÀ CON NOI?</div>
+      <div class="modal-btns">
+        <button class="modal-btn-no" onclick="modalShowNo()">NO — VOGLIO ESSERE SEGUITO</button>
+        <button class="modal-btn-yes" onclick="modalShowYes()">Sì, ho già il mio tutor</button>
+      </div>
+    </div>
+
+    <!-- Step 2a: NO — contatta Andrea -->
+    <div id="modal-step-no" style="display:none;">
+      <div class="modal-eyebrow">Parliamone</div>
+      <h2>Scrivimi<br><span>adesso.</span></h2>
+      <p>Valutiamo insieme se e come il tuo obiettivo è raggiungibile — senza impegno.</p>
+      <a class="btn-wa" href="https://wa.me/393478982799?text=Ciao%20Andrea%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20capire%20se%20il%20mio%20obiettivo%20%C3%A8%20realistico%20per%20me." target="_blank" style="display:flex; justify-content:center; margin:0 auto;">
+        <svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        SCRIVIMI SU WHATSAPP
+      </a>
+      <p style="font-family:'Oswald',sans-serif; font-size:12px; color:var(--gray); margin-top:10px; letter-spacing:1px; opacity:0.7;">⚡ Risponde entro pochi minuti</p>
+      <button class="modal-btn-yes" onclick="modalBack()" style="margin-top:12px; width:100%;">← Torna indietro</button>
+    </div>
+
+    <!-- Step 2b: SÌ — scegli tutor -->
+    <div id="modal-step-yes" style="display:none;">
+      <div class="modal-eyebrow">Scrivi al tuo tutor</div>
+      <h2>Scegli il tuo<br><span>riferimento.</span></h2>
+      <div class="modal-tutor-grid">
+        <a class="btn-tutor" href="https://wa.me/393934022837?text=Ciao%20Gaetano%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20parlare%20del%20mio%20piano." target="_blank">
+          <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Gaetano
+        </a>
+        <a class="btn-tutor" href="https://wa.me/393514166200?text=Ciao%20Roman%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20parlare%20del%20mio%20piano." target="_blank">
+          <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Roman
+        </a>
+        <a class="btn-tutor btn-tutor-disabled" href="#" onclick="return false;">
+          <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Christopher
+        </a>
+        <a class="btn-tutor btn-tutor-disabled" href="#" onclick="return false;">
+          <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Luigi
+        </a>
+        <a class="btn-tutor" href="https://wa.me/393518574762?text=Ciao%20Mattia%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20parlare%20del%20mio%20piano." target="_blank">
+          <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Mattia
+        </a>
+        <a class="btn-tutor" href="https://wa.me/41415881194?text=Ciao%20Andrea%2C%20ho%20usato%20il%20tool%20della%20Masterclass%20Trading%20da%20Zero%20e%20vorrei%20parlare%20del%20mio%20piano." target="_blank">
+          <svg class="wa-icon-sm" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Andrea C.
+        </a>
+      </div>
+      <p style="font-family:'Oswald',sans-serif; font-size:12px; color:var(--gray); margin-top:12px; letter-spacing:1px; opacity:0.7;">⚡ Risponde entro pochi minuti</p>
+      <button class="modal-btn-yes" onclick="modalBack()" style="margin-top:10px; width:100%;">← Torna indietro</button>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
